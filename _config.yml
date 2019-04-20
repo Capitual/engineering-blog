@@ -17,3 +17,13 @@ github_username:  capitual
 
 # Build settings
 markdown: kramdown
+
+authors:
+  jesobreira:
+    name: Jefrey S. Santos
+    email: jefrey.santos@capitual.io
+    twitter: https://twitter.com/jefreyssantos
+    linkedin: https://linkedin.com/jesobreira
+    github: https://github.com/jesobreira
+    web: https://medium.com/jefreysantos
+    bio: Full-stack developer and blockchain engineer. Disruptive technologies believer. CTO at Capitual.

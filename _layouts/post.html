@@ -5,14 +5,28 @@ layout: default
 
   <header class="post-header">
     <h1 class="post-title" itemprop="name headline">{{ page.title }}</h1>
-    <p class="post-meta"><time datetime="{{ page.date | date_to_xmlschema }}" itemprop="datePublished">{{ page.date | date: "%b %-d, %Y" }}</time>{% if page.author %} • <span itemprop="author" itemscope itemtype="http://schema.org/Person"><span itemprop="name">{{ page.author }}</span></span>{% endif %}</p>
+    <p class="post-meta"><time datetime="{{ page.date | date_to_xmlschema }}" itemprop="datePublished">{{ page.date | date: "%b %-d, %Y" }}</time></p>
   </header>
 
   <div class="post-content" itemprop="articleBody">
     {{ content }}
   </div>
 
-  {% if page.comments %}
+</article>
+
+{% if page.author %}
+<div class="post-author">
+	<figure class="author-avatar">
+		<img src="/img/authors/{{ page.author }}.jpg" />
+	</figure>
+	<div class="author-info">
+		<span itemprop="author" itemscope itemtype="http://schema.org/Person"><span itemprop="name" class="author-name">{{ site.authors[page.author].name }}</span></span>
+		<p>{{ site.authors[page.author].bio }}</p>
+	</div>
+</div>
+{% endif %}
+
+{% if page.comments %}
 	<div id="disqus_thread"></div>
 	<script>
 	(function() { // DON'T EDIT BELOW THIS LINE
@@ -25,5 +39,3 @@ layout: default
 	<noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
 		                    
   {% endif %}
-
-</article>

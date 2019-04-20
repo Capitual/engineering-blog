@@ -239,3 +239,20 @@
         }
     }
 }
+
+.post-author {
+    background: #eee;
+    border-radius: 25% 0 0 25%;
+    padding: 10px 5px 10px 5px;
+    .author-avatar img {
+        float: left;
+        width: 120px;
+        border-radius: 100%;
+    }
+    .author-name {
+        font-size: 1.5em;
+    }
+    .author-info {
+        padding-left: 150px;
+    }
+}
