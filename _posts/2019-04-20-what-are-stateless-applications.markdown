@@ -38,7 +38,7 @@ The application below stores the user's login procedure in a variable. It's stat
 ```
 let trials = 0
 app.post('/login', (req, res) => {
-	if (auth(req.body.username, req.body.password)) {
+	if (trials <= 3 && auth(req.body.username, req.body.password)) {
 		res.send("welcome!")
 	} else {
 		trials++
@@ -56,7 +56,7 @@ The application below is also stateful, and does not share the state to its repl
 ```
 let trials = {}
 app.post('/login', (req, res) => {
-	if (auth(req.body.username, req.body.password)) {
+	if (trials <= 3 && auth(req.body.username, req.body.password)) {
 		res.send("welcome!")
 	} else {
 		if (trials[req.body.username]) {
@@ -111,3 +111,34 @@ We could suggest some relational database, like MySQL or PostgreSQL, since such 
 For this use case, key-value storages like Memcached and Redis are better suitable. As they have less tasks to perform for retrieving one value (since there aren't tables or columns, and everything is a "key" with a "value"), their use is highly recommended when dealing with temporary data that is often accessed. Also, these engines often offer a way to control each key's expiration time makes it less likely for leaks and accidental persistence of unnecessary data.
 
 Obviously, since these storages are unrelational and only key-value based, you cannot fetch, at once, the data related to an specified user. And obviously, you cannot store a variable named simply "login_attempts", as it will be valid for all your clients. However, you can *namespace* it (for example: `login_attempts.[user id]` or `login_attempts.[IP address]`) and the problem is gone.
+
+Let's see an example?
+
+Let's use [cacheman-redis](https://www.npmjs.com/package/cacheman-redis) to convert the code we've been dealing with above to a multireplica-safe one:
+
+```
+let CachemanRedis = require('cacheman-redis')
+let cache = new CachemanRedis(/* redis connection details */)
+app.post('/login', (req, res) => {
+ cache.get('loginattempts:'+req.body.username, (err, trials) => {
+  if (trials <= 3 && auth(req.body.username, req.body.password)) {
+   res.send("welcome!")
+  } else {
+   if (trials) {
+    cache.set('loginattempts:'+req.body.username, trials++)
+    if (trials > 3) {
+     res.send("Brute force blocked")
+    } else {
+     res.send("Wrong credentials")
+    }
+   }
+   else {
+    cache.set('loginattempts:'+req.body.username, 1)
+    res.send("Wrong credentials")
+   }
+  }
+ })
+})
+```
+
+While this code may be improved in several ways (you could promisify the caching functions; also, blocking the user for login attempts may be a little awkward in most of the situations), now our code is able to recover, from a centralized Redis database, the previous login attempts of the user currently trying to login.
